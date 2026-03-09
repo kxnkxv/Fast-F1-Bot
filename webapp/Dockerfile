@@ -1,12 +1,11 @@
-FROM node:20-alpine AS build
+FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /app/webapp
+
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install --include=dev
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 3000
+CMD ["npx", "vite", "preview", "--host", "0.0.0.0", "--port", "3000"]
