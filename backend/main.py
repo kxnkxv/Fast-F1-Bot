@@ -2,6 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Ensure the project root is on sys.path so `from backend.xxx` works
+# regardless of whether we're invoked as `python backend/main.py` or `python -m backend.main`.
+_project_root = str(Path(__file__).resolve().parent.parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
 import asyncio
 import logging
 from contextlib import asynccontextmanager
