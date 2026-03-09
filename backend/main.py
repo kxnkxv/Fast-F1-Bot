@@ -18,6 +18,7 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from telegram.ext import Application
 
 from backend.api.router import api_router
@@ -154,6 +155,15 @@ app.include_router(api_router)
 async def health() -> dict[str, str]:
     """Simple health-check endpoint."""
     return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Serve webapp static files (SPA)
+# ---------------------------------------------------------------------------
+_webapp_dist = Path(__file__).resolve().parent.parent / "webapp" / "dist"
+if _webapp_dist.is_dir():
+    app.mount("/", StaticFiles(directory=str(_webapp_dist), html=True), name="webapp")
+    logger.info("Serving webapp from %s", _webapp_dist)
 
 
 # ---------------------------------------------------------------------------
