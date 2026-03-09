@@ -13,6 +13,7 @@ if _project_root not in sys.path:
 
 import asyncio
 import logging
+import mimetypes
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -160,6 +161,8 @@ async def health() -> dict[str, str]:
 # ---------------------------------------------------------------------------
 # Serve webapp static files (SPA)
 # ---------------------------------------------------------------------------
+# .jsb = JS bundle renamed to avoid hosting Node.js auto-detection
+mimetypes.add_type("application/javascript", ".jsb")
 _webapp_dist = Path(__file__).resolve().parent / "static"
 if _webapp_dist.is_dir():
     app.mount("/", StaticFiles(directory=str(_webapp_dist), html=True), name="webapp")
