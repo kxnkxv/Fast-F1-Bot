@@ -160,7 +160,7 @@ async def health() -> dict[str, str]:
 # ---------------------------------------------------------------------------
 # Serve webapp static files (SPA)
 # ---------------------------------------------------------------------------
-_webapp_dist = Path(__file__).resolve().parent.parent / "webapp" / "dist"
+_webapp_dist = Path(__file__).resolve().parent / "static"
 if _webapp_dist.is_dir():
     app.mount("/", StaticFiles(directory=str(_webapp_dist), html=True), name="webapp")
     logger.info("Serving webapp from %s", _webapp_dist)

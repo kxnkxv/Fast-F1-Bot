@@ -27,16 +27,8 @@ dump.rdb
 # Node
 node_modules/
 
-# Webapp sources — only dist/ is needed for deployment
-webapp/src/
-webapp/public/
-webapp/package.json
-webapp/package-lock.json
-webapp/vite.config.js
-webapp/tsconfig.json
-webapp/tsconfig.app.json
-webapp/index.html
-# webapp/dist/ — committed for hosting
+# Webapp — all sources; static build is in backend/static/
+webapp/
 
 # OS
 .DS_Store
