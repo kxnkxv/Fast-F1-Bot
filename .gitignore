@@ -33,6 +33,9 @@ webapp/dist/
 .DS_Store
 Thumbs.db
 
+# User data
+data/
+
 # Logs
 *.log
 

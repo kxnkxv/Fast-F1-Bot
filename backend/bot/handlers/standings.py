@@ -13,6 +13,7 @@ from backend.bot.handlers.settings import get_user_lang
 from backend.bot.keyboards import standings_keyboard
 from backend.config import settings
 from backend.i18n import get_text
+from backend.services.favorites import favorites_service
 from backend.services.standings import standings_service
 
 logger = logging.getLogger(__name__)
@@ -42,7 +43,11 @@ async def wdc_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await update.message.reply_text(get_text("no_standings", lang))
             return
 
-        banner = render_standings(standings, mode="drivers")
+        user_id = update.effective_user.id if update.effective_user else 0
+        fav = favorites_service.get(user_id)
+        banner = render_standings(standings, mode="drivers",
+                                  favorite_drivers=set(fav.drivers),
+                                  favorite_teams=set(fav.teams))
         keyboard = standings_keyboard(settings.webapp_url)
 
         await update.message.reply_photo(photo=banner, reply_markup=keyboard)
@@ -68,7 +73,11 @@ async def wcc_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await update.message.reply_text(get_text("no_standings", lang))
             return
 
-        banner = render_standings(standings, mode="constructors")
+        user_id = update.effective_user.id if update.effective_user else 0
+        fav = favorites_service.get(user_id)
+        banner = render_standings(standings, mode="constructors",
+                                  favorite_drivers=set(fav.drivers),
+                                  favorite_teams=set(fav.teams))
         keyboard = standings_keyboard(settings.webapp_url)
 
         await update.message.reply_photo(photo=banner, reply_markup=keyboard)

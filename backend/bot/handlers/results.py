@@ -18,6 +18,7 @@ from backend.models.enums import SessionType
 from backend.models.schemas import SessionResult
 from backend.services.assets import asset_service
 from backend.services.f1_data import f1_data, _driver_cdn_code
+from backend.services.favorites import favorites_service
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +95,10 @@ async def _send_result(
         )
 
         photos = await _fetch_photos(year, driver_results)
-        banner = render_func(session_result, photos)
+        user_id = update.effective_user.id if update.effective_user else 0
+        fav = favorites_service.get(user_id)
+        fav_set = set(fav.drivers) if not fav.is_empty() else set()
+        banner = render_func(session_result, photos, favorite_drivers=fav_set)
 
         event_id = event if isinstance(event, int) else 0
         keyboard = results_keyboard(year, event_id, session_type, settings.webapp_url)

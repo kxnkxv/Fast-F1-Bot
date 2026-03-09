@@ -6,6 +6,7 @@ from telegram.ext import Application
 
 from backend.bot.handlers import (
     driver,
+    favorites,
     results,
     schedule,
     settings,
@@ -40,6 +41,10 @@ def register_handlers(app: Application) -> None:
 
     # Telemetry (speed, laps, strategy)
     for handler in telemetry.get_handlers():
+        app.add_handler(handler)
+
+    # Favorites
+    for handler in favorites.get_handlers():
         app.add_handler(handler)
 
     # Settings (lang)

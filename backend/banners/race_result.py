@@ -139,6 +139,7 @@ def _draw_results_list(
     img: Image.Image,
     results,
     y_start: int,
+    favorite_drivers: set[str] | None = None,
 ) -> None:
     """Compact table for positions 4 through 10."""
     draw = ImageDraw.Draw(img)
@@ -163,11 +164,15 @@ def _draw_results_list(
         pos_text = f"{res.position}"
         draw.text((margin_l + 12, y + 4), pos_text, font=pos_font, fill=F1Colors.TEXT_SECONDARY)
 
-        # Driver code
-        draw.text((margin_l + 50, y + 4), res.driver_code, font=name_font, fill=F1Colors.TEXT)
+        # Driver code (★ if favorite)
+        is_fav = favorite_drivers and res.driver_code in favorite_drivers
+        code_label = f"★ {res.driver_code}" if is_fav else res.driver_code
+        code_color = "#FFD700" if is_fav else F1Colors.TEXT
+        draw.text((margin_l + 50, y + 4), code_label, font=name_font, fill=code_color)
 
         # Driver name
-        draw.text((margin_l + 110, y + 4), res.driver_name, font=detail_font, fill=F1Colors.TEXT_SECONDARY)
+        name_x = margin_l + (130 if is_fav else 110)
+        draw.text((name_x, y + 4), res.driver_name, font=detail_font, fill=F1Colors.TEXT_SECONDARY)
 
         # Gap
         gap_text = res.gap or res.time or ""
@@ -195,6 +200,7 @@ def _draw_results_list(
 def render_race_result(
     result: SessionResult,
     driver_photos: dict[str, bytes] | None = None,
+    favorite_drivers: set[str] | None = None,
 ) -> BytesIO:
     """Render a race result banner and return it as a PNG BytesIO.
 
@@ -205,9 +211,13 @@ def render_race_result(
     driver_photos:
         Mapping of driver code → raw image bytes.  Missing entries
         produce placeholder silhouettes.
+    favorite_drivers:
+        Set of driver codes that should be highlighted with ★.
     """
     if driver_photos is None:
         driver_photos = {}
+    if favorite_drivers is None:
+        favorite_drivers = set()
 
     img = _renderer.create_base("race_result")
     draw = ImageDraw.Draw(img)
@@ -260,7 +270,7 @@ def render_race_result(
     # --- P4–P10 list ---
     rest = [r for r in sorted_results[3:10]]
     if rest:
-        _draw_results_list(img, rest, divider_y + 8)
+        _draw_results_list(img, rest, divider_y + 8, favorite_drivers)
 
     # Footer branding line
     ft_font = font_caption(12)

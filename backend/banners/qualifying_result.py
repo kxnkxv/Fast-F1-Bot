@@ -178,6 +178,7 @@ def _draw_grid_row(
 def render_qualifying_result(
     result: SessionResult,
     driver_photos: dict[str, bytes] | None = None,
+    favorite_drivers: set[str] | None = None,
 ) -> BytesIO:
     """Render a qualifying banner and return it as a PNG BytesIO.
 

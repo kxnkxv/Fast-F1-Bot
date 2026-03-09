@@ -25,6 +25,8 @@ BOT_COMMANDS = [
     BotCommand("speed", "Speed trace (e.g. /speed 2025 1 VER NOR)"),
     BotCommand("laps", "Lap comparison (e.g. /laps 2025 1 VER NOR)"),
     BotCommand("strategy", "Tire strategy"),
+    BotCommand("favorites", "Manage favorite drivers & teams"),
+    BotCommand("fav", "Quick favorites (e.g. /fav add VER)"),
     BotCommand("lang", "Change language (en/ru)"),
     BotCommand("app", "Open F1 web app"),
     BotCommand("help", "Show help"),

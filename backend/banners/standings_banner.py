@@ -218,6 +218,8 @@ def _draw_leader_highlight(
 def render_standings(
     standings: StandingsResponse,
     mode: str = "drivers",
+    favorite_drivers: set[str] | None = None,
+    favorite_teams: set[str] | None = None,
 ) -> BytesIO:
     """Render a championship standings banner as a PNG BytesIO.
 
