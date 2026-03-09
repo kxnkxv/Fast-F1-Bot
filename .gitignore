@@ -27,7 +27,17 @@ dump.rdb
 
 # Node
 node_modules/
-# webapp/dist/ — committed for hosting that doesn't run build
+
+# Webapp sources — only dist/ is needed for deployment
+webapp/src/
+webapp/public/
+webapp/package.json
+webapp/package-lock.json
+webapp/vite.config.js
+webapp/tsconfig.json
+webapp/tsconfig.app.json
+webapp/index.html
+# webapp/dist/ — committed for hosting
 
 # OS
 .DS_Store
