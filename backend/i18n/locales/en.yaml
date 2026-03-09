@@ -1,0 +1,79 @@
+# Start & Help
+welcome: |
+  Welcome to F1 Bot!
+
+  Use commands to get race results, standings, and more.
+  Tap the button below to open the full F1 App.
+
+help: |
+  Available commands:
+
+  /race [year] [round] — Race results
+  /qualifying [year] [round] — Qualifying results
+  /sprint [year] [round] — Sprint results
+  /wdc [year] — Drivers championship
+  /wcc [year] — Constructors championship
+  /calendar [year] — Season calendar
+  /next — Next race info
+  /driver CODE — Driver profile (e.g. /driver VER)
+  /speed year round DR1 [DR2] — Speed trace
+  /laps year round DR1 [DR2] — Lap comparison
+  /strategy [year] [round] — Tire strategy
+  /lang en|ru — Change language
+  /app — Open F1 WebApp
+
+open_app: "Open F1 App"
+open_webapp: "View in App"
+
+# Standings
+wdc_title: "Drivers Championship {year}"
+wcc_title: "Constructors Championship {year}"
+
+# Calendar
+calendar_title: "F1 Calendar {year}"
+next_race: "Next Race"
+days_until: "{days} days until the race"
+
+# Results
+race_result_title: "{event} — Race"
+qualifying_title: "{event} — Qualifying"
+sprint_title: "{event} — Sprint"
+
+# Driver
+driver_profile: "{name} — Profile"
+season_stats: "Season {year}"
+points: "Points"
+wins: "Wins"
+podiums: "Podiums"
+position: "Position"
+
+# Errors
+error_generic: "Something went wrong. Please try again."
+error_no_data: "No data available for this request."
+error_invalid_driver: "Driver '{code}' not found."
+error_invalid_session: "Session data not available yet."
+error_results: "Failed to load {session} results. Please try again."
+error_standings: "Failed to load standings. Please try again."
+error_calendar: "Failed to load calendar. Please try again."
+error_next: "Failed to load next race info. Please try again."
+error_driver: "Failed to load driver profile. Please try again."
+error_telemetry: "Failed to load telemetry data. Please try again."
+
+# Usage hints
+driver_usage: "Usage: /driver CODE (e.g. /driver VER)"
+driver_invalid_code: "Invalid driver code: '{code}'. Use 3-letter abbreviation (e.g. VER, HAM, NOR)."
+speed_usage: "Usage: /speed YEAR ROUND DRIVER1 [DRIVER2] (e.g. /speed 2025 1 VER NOR)"
+laps_usage: "Usage: /laps YEAR ROUND DRIVER1 [DRIVER2] (e.g. /laps 2025 1 VER NOR)"
+
+# Missing data
+no_results: "No results available for {session}."
+no_standings: "No standings data available."
+no_calendar: "No calendar data available."
+no_next_event: "No upcoming events found."
+
+# Settings
+lang_changed: "Language changed to English."
+lang_current: "Current language: English"
+
+# Loading
+loading: "Loading data..."
