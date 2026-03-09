@@ -16,10 +16,16 @@ class Settings(BaseSettings):
 
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+    port: int = 0  # hosting platforms set PORT
 
     log_level: str = "INFO"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+
+    @property
+    def effective_port(self) -> int:
+        """Use PORT from hosting platform if set, otherwise api_port."""
+        return self.port if self.port else self.api_port
 
     @property
     def ff1_cache_path(self) -> Path:

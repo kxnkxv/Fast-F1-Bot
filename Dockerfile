@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ backend/
 COPY webapp/dist/ webapp/dist/
 
-EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 3000
+CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "3000"]
