@@ -27,7 +27,7 @@ dump.rdb
 
 # Node
 node_modules/
-webapp/dist/
+# webapp/dist/ — committed for hosting that doesn't run build
 
 # OS
 .DS_Store
