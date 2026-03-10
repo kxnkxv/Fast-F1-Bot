@@ -38,7 +38,8 @@ class TelemetryService:
             return cached
 
         async def _fetch() -> list[str]:
-            session = await f1_data.load_session(year, event, session_type)
+            # Light load — laps only, no telemetry (saves ~80% RAM)
+            session = await f1_data.load_session(year, event, session_type, telemetry=False)
             drivers = await asyncio.to_thread(
                 lambda: sorted(session.laps["Driver"].unique().tolist())
             )
@@ -125,8 +126,8 @@ class TelemetryService:
             return StrategyResponse(**cached)
 
         async def _fetch() -> StrategyResponse:
-            # Strategy is always from the race session
-            session = await f1_data.load_session(year, event, "Race")
+            # Strategy only needs laps data, not telemetry
+            session = await f1_data.load_session(year, event, "Race", telemetry=False)
             strategy = await asyncio.to_thread(self._extract_strategy, session)
             await cache.set(cache_key, strategy.model_dump(), ttl=TTL_FINAL_RESULT)
             return strategy

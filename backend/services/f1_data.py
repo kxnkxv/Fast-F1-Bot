@@ -114,17 +114,26 @@ class F1DataService:
         year: int,
         event: str | int,
         session_type: str,
+        *,
+        telemetry: bool = True,
     ) -> Any:
         """Load a FastF1 session (blocking work offloaded to a thread).
 
+        Set *telemetry=False* for a lightweight load (laps only, much less RAM).
         Returns the raw ``fastf1.core.Session`` object.
         """
-        cache_key = cache.make_key("session", year, event, session_type)
+        suffix = "full" if telemetry else "light"
+        cache_key = cache.make_key("session", year, event, session_type, suffix)
 
         async def _fetch() -> Any:
             def _blocking() -> Any:
                 session = fastf1.get_session(year, event, session_type)
-                session.load()
+                session.load(
+                    laps=True,
+                    telemetry=telemetry,
+                    weather=False,
+                    messages=False,
+                )
                 return session
 
             return await asyncio.to_thread(_blocking)
@@ -146,7 +155,8 @@ class F1DataService:
         if cached is not None:
             return [DriverResult(**r) for r in cached]
 
-        session = await self.load_session(year, event, session_type)
+        # Results only need laps for fastest-lap detection, not full telemetry
+        session = await self.load_session(year, event, session_type, telemetry=False)
         results = self._extract_results(session)
 
         # Determine TTL — completed sessions get a long TTL
