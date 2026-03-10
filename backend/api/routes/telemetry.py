@@ -26,12 +26,9 @@ async def get_speed_trace(
     driver: str,
     user: dict | None = Depends(get_telegram_user),
 ) -> TelemetryResponse:
-    """Return speed-trace telemetry for a specific driver in a session.
+    """Return speed-trace telemetry for a driver, plus list of available drivers.
 
-    - **year**: Season year
-    - **event**: Event name or round number
-    - **session**: Session type (R, Q, FP1, etc.)
-    - **driver**: Three-letter driver code (e.g. "VER")
+    Pass `_available` as driver to get only the available drivers list (no telemetry).
     """
     try:
         try:
@@ -39,15 +36,31 @@ async def get_speed_trace(
         except ValueError:
             event_identifier = event
 
-        result = await telemetry_service.get_speed_trace(
+        # Always get available drivers for the session
+        available = await telemetry_service.get_available_drivers(
+            year, event_identifier, session
+        )
+
+        # If just requesting the list, return empty laps
+        if driver.upper() == "_AVAILABLE":
+            return TelemetryResponse(
+                year=year,
+                event=event,
+                session=session,
+                available_drivers=available,
+            )
+
+        # Otherwise, get the actual telemetry
+        lap = await telemetry_service.get_speed_trace(
             year, event_identifier, session, driver.upper()
         )
-        if result is None:
-            raise HTTPException(
-                status_code=404,
-                detail=f"No telemetry data found for {driver.upper()} in {year} {event} {session}.",
-            )
-        return result
+        return TelemetryResponse(
+            year=year,
+            event=event,
+            session=session,
+            laps=[lap],
+            available_drivers=available,
+        )
 
     except HTTPException:
         raise

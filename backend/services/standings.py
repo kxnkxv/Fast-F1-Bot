@@ -96,13 +96,17 @@ class StandingsService:
                             wins = int(float(wins)) if wins == wins else 0
                         except (TypeError, ValueError):
                             wins = 0
+                        # constructorNames can be a list (mid-season team changes)
+                        team_raw = row.get("constructorName", "") or row.get("constructorNames", "")
+                        if isinstance(team_raw, list):
+                            team_raw = team_raw[-1] if team_raw else ""
                         rows.append(
                             {
                                 "position": pos,
                                 "driver_code": str(row.get("driverCode", "")),
                                 "first_name": str(row.get("givenName", "")),
                                 "last_name": str(row.get("familyName", "")),
-                                "team": str(row.get("constructorName", "") or row.get("constructorNames", "")),
+                                "team": str(team_raw),
                                 "points": pts,
                                 "wins": wins,
                             }

@@ -23,6 +23,31 @@ class TelemetryService:
     """Extracts telemetry and strategy information from FastF1 sessions."""
 
     # ------------------------------------------------------------------
+    # Available drivers for a session
+    # ------------------------------------------------------------------
+    async def get_available_drivers(
+        self,
+        year: int,
+        event: str | int,
+        session_type: str,
+    ) -> list[str]:
+        """Return list of driver codes that have laps in the session."""
+        cache_key = cache.make_key("telemetry", "drivers", year, event, session_type)
+        cached = await cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        async def _fetch() -> list[str]:
+            session = await f1_data.load_session(year, event, session_type)
+            drivers = await asyncio.to_thread(
+                lambda: sorted(session.laps["Driver"].unique().tolist())
+            )
+            await cache.set(cache_key, drivers, ttl=TTL_FINAL_RESULT)
+            return drivers
+
+        return await deduplicated_call(cache_key, _fetch)
+
+    # ------------------------------------------------------------------
     # Speed trace for a single driver
     # ------------------------------------------------------------------
     async def get_speed_trace(

@@ -100,9 +100,12 @@ class LapTelemetry(BaseModel):
 
 class TelemetryResponse(BaseModel):
     year: int
-    event_name: str
-    session_type: str
-    laps: list[LapTelemetry]
+    event: str = ""
+    session: str = ""
+    event_name: str = ""
+    session_type: str = ""
+    laps: list[LapTelemetry] = []
+    available_drivers: list[str] = []
 
 
 class TireStint(BaseModel):

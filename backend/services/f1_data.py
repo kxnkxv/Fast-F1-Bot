@@ -20,17 +20,24 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 TEAM_SLUG_MAP: dict[str, str] = {
     "Red Bull Racing": "redbullracing",
+    "Red Bull": "redbullracing",
     "Mercedes": "mercedes",
     "McLaren": "mclaren",
     "Ferrari": "ferrari",
     "Aston Martin": "astonmartin",
     "Alpine": "alpine",
+    "Alpine F1 Team": "alpine",
     "Williams": "williams",
     "RB": "rb",
+    "RB F1 Team": "rb",
     "AlphaTauri": "rb",
     "Kick Sauber": "kicksauber",
     "Alfa Romeo": "kicksauber",
+    "Audi": "audi",
     "Haas F1 Team": "haasf1team",
+    "Haas": "haasf1team",
+    "Cadillac F1 Team": "cadillac",
+    "Cadillac": "cadillac",
 }
 
 # ---------------------------------------------------------------------------
