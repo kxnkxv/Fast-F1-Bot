@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,6 +15,10 @@ from backend.services.telemetry_svc import telemetry_service
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/telemetry", tags=["telemetry"])
+
+# Timeout for FastF1 session loading (seconds).
+# Prevents OOM on constrained hosting by aborting before memory explodes.
+_SESSION_TIMEOUT = 90
 
 
 async def _resolve_event(year: int, event: str) -> str | int:
@@ -47,10 +52,19 @@ async def get_speed_trace(
     try:
         event_identifier = await _resolve_event(year, event)
 
-        # Always get available drivers for the session
-        available = await telemetry_service.get_available_drivers(
-            year, event_identifier, session
-        )
+        # Get available drivers with timeout protection
+        try:
+            available = await asyncio.wait_for(
+                telemetry_service.get_available_drivers(
+                    year, event_identifier, session
+                ),
+                timeout=_SESSION_TIMEOUT,
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=503,
+                detail="Session data is loading. Please try again in a few minutes.",
+            )
 
         # If just requesting the list, return empty laps
         if driver.upper() == "_AVAILABLE":
@@ -61,10 +75,20 @@ async def get_speed_trace(
                 available_drivers=available,
             )
 
-        # Otherwise, get the actual telemetry
-        lap = await telemetry_service.get_speed_trace(
-            year, event_identifier, session, driver.upper()
-        )
+        # Otherwise, get the actual telemetry with timeout
+        try:
+            lap = await asyncio.wait_for(
+                telemetry_service.get_speed_trace(
+                    year, event_identifier, session, driver.upper()
+                ),
+                timeout=_SESSION_TIMEOUT,
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=503,
+                detail="Telemetry data is loading. Please try again in a few minutes.",
+            )
+
         return TelemetryResponse(
             year=year,
             event=str(event_identifier),
@@ -94,15 +118,21 @@ async def get_tire_strategy(
     event: str,
     user: dict | None = Depends(get_telegram_user),
 ) -> StrategyResponse:
-    """Return tire strategy data for an event.
-
-    - **year**: Season year
-    - **event**: Event name or round number
-    """
+    """Return tire strategy data for an event."""
     try:
         event_identifier = await _resolve_event(year, event)
 
-        result = await telemetry_service.get_tire_strategy(year, event_identifier)
+        try:
+            result = await asyncio.wait_for(
+                telemetry_service.get_tire_strategy(year, event_identifier),
+                timeout=_SESSION_TIMEOUT,
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=503,
+                detail="Strategy data is loading. Please try again in a few minutes.",
+            )
+
         if result is None:
             raise HTTPException(
                 status_code=404,
