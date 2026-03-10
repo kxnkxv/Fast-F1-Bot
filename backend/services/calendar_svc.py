@@ -125,6 +125,30 @@ class CalendarService:
             events.append(EventInfo(**r))
         return events
 
+    async def get_last_event_round(self, year: int) -> int | None:
+        """Return the round number of the most recently completed event."""
+        calendar = await self.get_calendar(year)
+        last = self._find_last_event(calendar.events)
+        return last.round if last else None
+
+    @staticmethod
+    def _find_last_event(events: list[EventInfo]) -> EventInfo | None:
+        """Return the most recent event whose date is in the past."""
+        now = datetime.now(tz=timezone.utc)
+        last: EventInfo | None = None
+        for event in events:
+            if not event.date:
+                continue
+            try:
+                event_dt = datetime.fromisoformat(event.date)
+                if event_dt.tzinfo is None:
+                    event_dt = event_dt.replace(tzinfo=timezone.utc)
+                if event_dt <= now:
+                    last = event
+            except (ValueError, TypeError):
+                continue
+        return last
+
     @staticmethod
     def _find_next_event(events: list[EventInfo]) -> EventInfo | None:
         """Return the first event whose date is in the future."""

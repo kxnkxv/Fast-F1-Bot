@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from backend.api.auth import get_telegram_user
 from backend.models.schemas import DriverResult, SessionResult
+from backend.services.calendar_svc import calendar_service
 from backend.services.f1_data import f1_data
 
 logger = logging.getLogger(__name__)
@@ -29,11 +30,17 @@ async def get_results(
     - **session**: Session type (e.g. "R", "Q", "FP1")
     """
     try:
-        # Try to interpret event as a round number
-        try:
-            event_identifier: str | int = int(event)
-        except ValueError:
-            event_identifier = event
+        # Resolve virtual identifiers like "last"
+        if event.lower() == "last":
+            round_num = await calendar_service.get_last_event_round(year)
+            if round_num is None:
+                raise HTTPException(status_code=404, detail="No completed events found.")
+            event_identifier: str | int = round_num
+        else:
+            try:
+                event_identifier = int(event)
+            except ValueError:
+                event_identifier = event
 
         results: list[DriverResult] = await f1_data.load_results(
             year, event_identifier, session

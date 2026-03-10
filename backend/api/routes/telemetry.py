@@ -8,11 +8,25 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from backend.api.auth import get_telegram_user
 from backend.models.schemas import StrategyResponse, TelemetryResponse
+from backend.services.calendar_svc import calendar_service
 from backend.services.telemetry_svc import telemetry_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/telemetry", tags=["telemetry"])
+
+
+async def _resolve_event(year: int, event: str) -> str | int:
+    """Resolve virtual event identifiers like 'last' to real round numbers."""
+    if event.lower() == "last":
+        round_num = await calendar_service.get_last_event_round(year)
+        if round_num is None:
+            raise HTTPException(status_code=404, detail="No completed events found for this season.")
+        return round_num
+    try:
+        return int(event)
+    except ValueError:
+        return event
 
 
 @router.get(
@@ -31,10 +45,7 @@ async def get_speed_trace(
     Pass `_available` as driver to get only the available drivers list (no telemetry).
     """
     try:
-        try:
-            event_identifier: str | int = int(event)
-        except ValueError:
-            event_identifier = event
+        event_identifier = await _resolve_event(year, event)
 
         # Always get available drivers for the session
         available = await telemetry_service.get_available_drivers(
@@ -45,7 +56,7 @@ async def get_speed_trace(
         if driver.upper() == "_AVAILABLE":
             return TelemetryResponse(
                 year=year,
-                event=event,
+                event=str(event_identifier),
                 session=session,
                 available_drivers=available,
             )
@@ -56,7 +67,7 @@ async def get_speed_trace(
         )
         return TelemetryResponse(
             year=year,
-            event=event,
+            event=str(event_identifier),
             session=session,
             laps=[lap],
             available_drivers=available,
@@ -89,10 +100,7 @@ async def get_tire_strategy(
     - **event**: Event name or round number
     """
     try:
-        try:
-            event_identifier: str | int = int(event)
-        except ValueError:
-            event_identifier = event
+        event_identifier = await _resolve_event(year, event)
 
         result = await telemetry_service.get_tire_strategy(year, event_identifier)
         if result is None:
